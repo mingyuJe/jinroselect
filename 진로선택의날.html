@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>기획국장 살인사건</title>
+  <meta name="description" content="기획국장 살인사건: 부스를 돌며 10개의 힌트를 모아 범인을 밝혀내세요." />
+  <meta property="og:title" content="기획국장 살인사건" />
+  <meta property="og:description" content="부스를 체험하면 힌트가 지급됩니다. 10개를 조합해 범인을 특정하세요." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://placehold.co/1200x630/png?text=%EC%9E%90%EC%97%B0%EB%8C%80+%EC%B6%94%EB%A6%AC+%EC%9D%B4%EB%B2%A4%ED%8A%B8" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230a0a0a'/><text x='50' y='55' font-size='48' text-anchor='middle' fill='white'>🔎</text></svg>">
+  <style>
+    :root{
+      --bg: #070707;
+      --panel: #0b0b0c;
+      --card: #0e0e10;
+      --text: #e9eaee;
+      --muted: #a1a6b2;
+      --brand: #e11d2e; /* 혈흔 레드 */
+      --danger: #ff3b3b;
+      --shadow: 0 12px 40px rgba(0,0,0,.6);
+      --radius: 14px;
+      --maxw: 1100px;
+    }
+    @media (prefers-color-scheme: light){
+      :root{ --bg:#0a0a0b; --panel:#0c0c0d; --card:#0f0f12; --text:#f1f2f5; --muted:#a3a8b3; --shadow:0 10px 30px rgba(0,0,0,.5);} 
+    } 
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Noto Sans KR, Arial, sans-serif;}
+    a{color:var(--brand);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .container{max-width:var(--maxw);margin:0 auto;padding:24px}
+    header{
+      position:sticky;top:0;z-index:50;
+      background:rgba(12,14,18,.7);backdrop-filter: blur(8px);
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+    nav{display:flex;align-items:center;gap:16px;justify-content:space-between;padding:14px 20px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.3px;text-transform:uppercase}
+    .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--brand);box-shadow:0 0 14px var(--brand),0 0 28px rgba(225,29,46,.35)}
+    .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--brand);box-shadow:0 0 16px var(--brand)}
+    .menu{display:flex;gap:14px;flex-wrap:wrap}
+    .menu a{font-size:14px;color:var(--muted)}
+    .menu a.active, .menu a:hover{color:var(--text)}
+    .hero{padding:72px 24px 36px;position:relative;overflow:hidden;background:radial-gradient(120% 80% at 50% -10%, rgba(225,29,46,.12), transparent 55%), radial-gradient(100% 60% at 80% 0%, rgba(225,29,46,.06), transparent 60%)}
+    .hero::after{content:"";position:absolute;inset:-20px;pointer-events:none;opacity:.07;background-image:repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0 2px, transparent 2px 4px),radial-gradient(circle at 10% 10%, rgba(225,29,46,.18), transparent 30%),radial-gradient(circle at 90% 0%, rgba(225,29,46,.12), transparent 40%);mix-blend-mode:overlay;animation:noise 2s steps(10) infinite}
+    @keyframes noise{to{transform:translate3d(0,0,0)} 50%{transform:translate3d(1px,-1px,0)}}
+    .hero .wrap{max-width:var(--maxw);margin:0 auto;display:grid;gap:16px}
+    h1{font-size: clamp(28px, 5vw, 44px);margin:0;line-height:1.15}
+    .subtitle{color:var(--muted);font-size: clamp(14px, 2.5vw, 18px)}
+    .title-glitch{position:relative;display:inline-block;text-shadow:0 0 18px rgba(225,29,46,.25)}
+    .title-glitch span{color:var(--brand)}
+    .title-glitch::before,.title-glitch::after{content:attr(data-text);position:absolute;left:0;top:0;opacity:.08}
+    .title-glitch::before{transform:translate(2px,0);color:#ff2d2d}
+    .title-glitch::after{transform:translate(-2px,0);color:#2dffdd}
+    @media (prefers-reduced-motion: no-preference){
+      .title-glitch{animation:gl 3s infinite}
+      @keyframes gl{0%,100%{filter:none} 10%{filter:hue-rotate(6deg)} 50%{filter:contrast(110%)}}
+    }
+    .badge{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(180deg, rgba(225,29,46,.18), rgba(225,29,46,.06));border:1px solid rgba(225,29,46,.3);padding:8px 12px;border-radius:999px;font-size:12px;color:var(--text);text-shadow:0 0 6px rgba(225,29,46,.35)}
+    .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
+    .btn{appearance:none;border:none;cursor:pointer;border-radius:12px;padding:12px 16px;font-weight:700}
+    .btn.primary{background:var(--brand);color:#0c0c0d;box-shadow:0 0 18px rgba(225,29,46,.35);transition:transform .08s ease}
+    .btn.primary:active{transform:scale(.98)}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.12);color:var(--text)}
+    .grid{display:grid;gap:16px}
+    @media (min-width: 720px){ .grid.cols-3{grid-template-columns: repeat(3, 1fr)} .grid.cols-2{grid-template-columns: repeat(2, 1fr)} }
+    section{padding:28px 24px}
+    .card{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+    .kicker{font-size:12px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase}
+    h2{font-size: clamp(22px, 4.2vw, 30px);margin:8px 0 12px}
+    h3{margin:0 0 8px}
+    .list{margin:0;padding-left:18px;color:var(--muted)}
+    .muted{color:var(--muted)}
+    .suspect-card{display:flex;gap:14px;align-items:flex-start}
+    .avatar{flex:0 0 56px;height:56px;border-radius:50%;background:linear-gradient(135deg, var(--brand), #2cd19d);display:flex;align-items:center;justify-content:center;font-weight:900;color:#0b1210}
+    .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);font-size:12px;color:var(--muted)}
+    details{background:var(--panel);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:12px}
+    details summary{cursor:pointer;user-select:none;list-style:none}
+    details[open]{outline:1px solid rgba(255,255,255,.08)}
+    .rule{display:flex;gap:10px}
+    .rule .num{flex:0 0 28px;height:28px;border-radius:8px;background:rgba(114,230,166,.18);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--brand)}
+    footer{padding:28px 24px;color:var(--muted);border-top:1px solid rgba(255,255,255,.08)}
+    .hint-tag{display:inline-block;margin:.25rem .25rem 0 0;padding:.35rem .6rem;border:1px dashed rgba(255,255,255,.14);border-radius:999px;font-size:12px;color:var(--muted)}
+    .notice{border-left:4px solid var(--brand);padding:10px 14px;border-radius:10px;background:linear-gradient(90deg, rgba(225,29,46,.12), rgba(225,29,46,.04))}
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <div class="brand"><span class="dot"></span>진로선택의날 - 기획국장 살인사건</div>
+      <div class="menu" id="menu">
+        <a href="#about" class="active">개요</a>
+        <a href="#how">참여 방법</a>
+        <a href="#suspects">용의자</a>
+        <a href="#submit">제출</a>
+        <a href="#faq">FAQ</a>
+      </div>
+    </nav>
+  </header>
+
+  <section class="hero" id="about">
+    <div class="wrap">
+      <h1 class="title-glitch">기획국장 살인사건</h1>
+      <p class="subtitle">각 학과 <b>부스를 체험</b>하면 힌트가 지급됩니다. <b>웹 페이지에는 힌트가 없습니다.</b> 현장에서 확인하세요.</p>
+      <div class="cta">
+        <a class="btn primary" href="#how">참여 시작하기</a>
+        <button class="btn ghost" id="shareBtn" type="button">링크 공유</button>
+      </div>
+      <p class="muted">일시: <b>2025-10-02</b> • 장소: 문회루</p>
+    </div>
+  </section>
+
+  <section id="how">
+    <div class="container grid cols-3">
+      <div class="card">
+        <div class="kicker">Step 0</div>
+        <h2>카드뉴스 사전 배포</h2>
+        <p class="muted">행사 전, 본 페이지와 연동된 카드뉴스로 <b>용의자 기본 정보</b>를 제공합니다.</p>
+      </div>
+      <div class="card">
+        <div class="kicker">Step 1</div>
+        <h2>부스 방문 → 단서 수집</h2>
+        <p class="muted">행사 당일, 각 학과 부스 방문 시 힌트를 지급합니다.</p>
+      </div>
+      <div class="card">
+        <div class="kicker">Step 2</div>
+        <h2>정답 응모</h2>
+        <p class="muted">수집한 힌트를 종합하여 <b>자연과학대학 운영본부 부스</b>에 최종 용의자와 근거를 제출합니다.</p>
+      </div>
+      <div class="card">
+        <div class="kicker">Step 3</div>
+        <h2>추첨 & 상품</h2>
+        <p class="muted">행사 종료 후 <b>정답자에 한해 추첨</b>을 진행하고, 상품을 제공합니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="suspects">
+    <div class="container">
+      <h2>용의자 LIST</h2>
+      <p class="muted">2025년 10월 1일, 자연과학대학 학생회 <b>기획국장 정*규</b>가 싸늘한 주검으로 발견됨. 각 학과 부스를 돌며 증거를 수집하여, 기획국장을 살해한 범인을 밝혀라!</p>
+
+      <div class="card" style="margin-bottom:12px">
+        <p class="muted">용의자: 기획국원 <b>이*영</b>, 대외협력국장 <b>두*수</b>, 부학생회장 <b>정*지</b>, 기획부국장 <b>조*인</b>, 기획국원 <b>조*별</b></p>
+      </div>
+
+      <div class="grid cols-2">
+        <div class="card suspect-card">
+          <div class="avatar">이</div>
+          <div>
+            <h3>이*영 · 기획국원 (여)</h3>
+            <p class="muted">인상착의: 장발</p>
+            <p class="muted">성격: 소심, 불만 쌓이는 성격, 열정적임</p>
+            <span class="pill">동기: 늘 허드렛일만 맡고 무시당했다는 분노</span>
+          </div>
+        </div>
+        <div class="card suspect-card">
+          <div class="avatar">두</div>
+          <div>
+            <h3>두*수 · 대외협력국장 (남)</h3>
+            <p class="muted">인상착의: 짧은 머리</p>
+            <p class="muted">성격: 외부 이미지 중시, 유쾌함</p>
+            <span class="pill">동기: 행사 제휴 쿠폰을 무리하게 부탁받은 데 대한 분노</span>
+          </div>
+        </div>
+        <div class="card suspect-card">
+          <div class="avatar">정</div>
+          <div>
+            <h3>정*지 · 부학생회장 (여)</h3>
+            <p class="muted">인상착의: 단발</p>
+            <p class="muted">성격: 직설적, 감정 기복 심함, 정에 약함</p>
+            <span class="pill">동기: 행사 예산에 관한 의견 불일치</span>
+          </div>
+        </div>
+        <div class="card suspect-card">
+          <div class="avatar">조</div>
+          <div>
+            <h3>조*인 · 기획부국장 (여)</h3>
+            <p class="muted">인상착의: 장발</p>
+            <p class="muted">성격: 책임감 있고 모범생 이미지, 내심은 인정 욕구 강함</p>
+            <span class="pill">동기: 열등감과 인정 욕구가 폭발</span>
+          </div>
+        </div>
+        <div class="card suspect-card">
+          <div class="avatar">별</div>
+          <div>
+            <h3>조*별 · 기획국원 (여)</h3>
+            <p class="muted">인상착의: 단발</p>
+            <p class="muted">성격: 착해 보이지만 속을 알 수 없음</p>
+            <span class="pill">동기: 정모씨에게 빌린 돈을 갚지 못해 폭로를 두려워함</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="submit">
+    <div class="container grid cols-2">
+      <div class="card">
+        <h2>최종 지목 제출</h2>
+        <p class="muted">모든 힌트를 모은 뒤, 자연과학대학 운영본부에 방문하여 정답을 제출하세요</p>
+        <ol class="list">
+          <li>학번</li>
+          <li>학과</li>
+          <li>이름</li>
+          <li>연락처</li>
+          <li>최종 용의자 1인</li>
+          <li>증거 조합 근거</li>
+        </ol>
+      </div>
+      <div class="card">
+        <h2>규칙 & 유의사항</h2>
+        <div class="rule"><div class="num">1</div><p class="muted">부스 체험만으로 힌트 제공. 별도 미션 없음.</p></div>
+        <div class="rule"><div class="num">2</div><p class="muted">힌트는 부분 정보입니다. <b>교차 배제</b>로만 결론 도달.</p></div>
+        <div class="rule"><div class="num">3</div><p class="muted">정답 공개는 행사 종료 이후 공개.</p></div>
+        <div class="rule"><div class="num">4</div><p class="muted">정답자에 한정하여 상품 추첨 예정</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="container grid cols-2">
+      <div class="card">
+        <h2>FAQ</h2>
+        <details>
+          <summary>힌트는 꼭 10개 모두 필요하나요?</summary>
+          <p class="muted">그렇지 않습니다. 다만 10개의 힌트를 모두 얻으면 범인을 확정할 수 있습니다.</p>
+        </details>
+        <details>
+          <summary>이미 아는 것 같으면 바로 제출해도 되나요?</summary>
+          <p class="muted">가능하지만, 오답 패널티가 있을 수 있습니다.</p>
+        </details>
+      </div>
+      <div class="card">
+        <h2>문의</h2>
+        <p class="muted">주관: 자연대 학생회 기획운영국</p>
+        <p class="muted">문의: <a href="amaranth7@jbnu.ac.kr">amaranth7@jbnu.ac.kr</a></p>
+        <p class="muted">제작 : 정민규</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <div>© 2025 자연과학대학 진로선택의날</div>
+    </div>
+  </footer>
+
+  <script>
+    // 간단한 스크립트: 섹션 스크롤 시 메뉴 active 상태 업데이트 + 공유
+    const links = document.querySelectorAll('.menu a');
+    const sections = [...links].map(a => document.querySelector(a.getAttribute('href')));
+    const shareBtn = document.getElementById('shareBtn');
+
+    function onScroll(){
+      const y = window.scrollY + 100;
+      for (let i=sections.length-1;i>=0;i--){
+        const s = sections[i];
+        if(!s) continue;
+        if (y >= s.offsetTop){
+          links.forEach(a=>a.classList.remove('active'));
+          links[i].classList.add('active');
+          break;
+        }
+      }
+    }
+    document.addEventListener('scroll', onScroll, {passive:true});
+
+    shareBtn?.addEventListener('click', async () => {
+      const shareData = { title: document.title, text: '자연과학대학 진로선택의 날', url: location.href };
+      if (navigator.share){
+        try{ await navigator.share(shareData);}catch(e){}
+      } else {
+        await navigator.clipboard.writeText(location.href);
+        shareBtn.textContent = '링크 복사됨 ✅';
+        setTimeout(()=> shareBtn.textContent='링크 공유', 1500);
+      }
+    });
+  </script>
+</body>
+</html>
