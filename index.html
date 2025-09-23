@@ -25,7 +25,6 @@
     }
     @media (prefers-color-scheme: light){
       :root{ --bg:#0a0a0b; --panel:#0c0c0d; --card:#0f0f12; --text:#f1f2f5; --muted:#a3a8b3; --shadow:0 10px 30px rgba(0,0,0,.5);} 
-    } 
     }
     *{box-sizing:border-box}
     html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Noto Sans KR, Arial, sans-serif;}
@@ -86,6 +85,10 @@
     .hint-tag{display:inline-block;margin:.25rem .25rem 0 0;padding:.35rem .6rem;border:1px dashed rgba(255,255,255,.14);border-radius:999px;font-size:12px;color:var(--muted)}
     .notice{border-left:4px solid var(--brand);padding:10px 14px;border-radius:10px;background:linear-gradient(90deg, rgba(225,29,46,.12), rgba(225,29,46,.04))}
     .avatar-img {flex: 0 0 56px;height: 56px;width: 56px;border-radius: 50%;object-fit: cover;box-shadow: 0 0 6px rgba(0,0,0,.3);
+    .codebox{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .codebox input{flex:1;min-width:220px;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:#0c0d10;color:var(--text)}
+    .hint-list{display:grid;gap:10px;margin-top:12px}
+    .hint-item{background:var(--panel);border:1px dashed rgba(255,255,255,.14);border-radius:12px;padding:12px}
   </style>
 </head>
 <body>
@@ -96,6 +99,7 @@
         <a href="#about" class="active">개요</a>
         <a href="#how">참여 방법</a>
         <a href="#suspects">용의자</a>
+        <a href="#unlock">코드 해제</a>
         <a href="#submit">제출</a>
         <a href="#faq">FAQ</a>
       </div>
@@ -161,7 +165,7 @@
           </div>
         </div>
         <div class="card suspect-card">
-          <div class="avatar">두</div>
+          <img class="avatar-img" src="image/do_su.ico" alt="두*수 프로필" />
           <div>
             <h3>두*수 · 대외협력국장 (남)</h3>
             <p class="muted">인상착의: 짧은 머리</p>
@@ -170,7 +174,7 @@
           </div>
         </div>
         <div class="card suspect-card">
-          <div class="avatar">정</div>
+          <img class="avatar-img" src="image/jeong_ji.ico" alt="정*지 프로필" />
           <div>
             <h3>정*지 · 부학생회장 (여)</h3>
             <p class="muted">인상착의: 단발</p>
@@ -198,6 +202,26 @@
         </div>
       </div>
     </div>
+  </section>
+  <section id="unlock">
+  <div class="container">
+    <h2>코드 해제</h2>
+    <p class="muted">부스에서 받은 <b>학과 전용 코드</b>를 입력하세요.</p>
+
+    <div class="card">
+      <div class="codebox">
+        <input id="codeInput" type="text" placeholder="코드를 입력하세요" inputmode="latin" autocomplete="off"/>
+        <button class="btn primary" id="btnUnlock" type="button">해제</button>
+        <button class="btn ghost" id="btnReset" type="button">초기화</button>
+      </div>
+      <div id="unlockMsg" class="muted" style="margin-top:8px"></div>
+      <div id="hintList" class="hint-list"></div>
+    </div>
+
+    <div class="notice" style="margin-top:12px">
+      <b>안내:</b> 같은 코드를 여러 명이 써도 됩니다.
+    </div>
+  </div>
   </section>
 
   <section id="submit">
@@ -251,6 +275,85 @@
       <div>© 2025 자연과학대학 진로선택의날</div>
     </div>
   </footer>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script>
+    const DEPT = {
+      SCI:'과학학과', PHY:'물리학과', SEMI:'반도체과학기술학과', MOL:'분자생물학과',
+      BIO:'생명과학과', MATH:'수학과', SPO:'스포츠과학과', GEO:'지구환경과학과',
+      STAT:'통계학과', CHEM:'화학과'
+    };
+
+    // === 정답 코드 SHA-256 해시 ===
+    const VALID_HASH = {
+      SCI: "997c1f338dc407bb48e55274c8b55489b990891eb1a5234780d37c15ac7e7450",
+      PHY: "a17bca0599dfaeb31f7748261519fef129d1d4962261aca4ea81e05c7acfcd1e",
+      SEMI:"a31d8b3b7f900d6586064487f66d93bbfdb10e02e2b088ed1afb75b7457f7e8e",
+      MOL: "027618cb51c29ddad1088fb231306fd397acfdfaddc60742aafa48fbd4674bc7",
+      BIO: "d0b0e99d470864e049309ba70d4cac64721a97c9f6c00f0169f913d2fdd0ab0b",
+      MATH:"5ee5c0a179a82151a0ef788fdc1f67095486b8702719a003afb4e89cd656fb58",
+      SPO: "d539c1ee2fd4140e8027b907cf966e25fc1dabfbaf9749cd24cc5cb1fc9783af",
+      GEO: "26b44f5aaa614ab5b633333069007799b571bd31f8560bef668885fbd87775c8",
+      STAT:"3ae81d10fed5c082c86c4e1dab4a51d81a9155ab89214fea1cbb25fa0baf11ce",
+      CHEM:"6f347ec90b55b7ebe84debc6971e8a219e1c3ded36b861303f87621073fa0018"
+    };
+
+    // === AES 암호화된 힌트 (정답 코드가 키) ===
+    const HINTS = {
+      SCI: "U2FsdGVkX18/VuM8dda/g8r4D9GOrsG5vVgs32ADy/t44DWt69G/hayR0W31KoTcGgTZ4w/ADSPABwkhML5UMw==",
+      PHY: "U2FsdGVkX19kFev7VOMIyol/W4pr6MhltX5ru51J/WDdWu/XyPcg6p2lPPYwmIkfyZ8CBGLkHiq1DBXIApD3J/WAOL5k9Ujp7dnkkfWVN6n5f0g6I6wNjaTnW4u3HPHA",
+      SEMI:"U2FsdGVkX19Oqs8uSP+yIXBwZ8pGg/s2aSISzkl/B+3pVwiy8Bcz0XUhIMjoU2viO01dTGtxrtVoZyKniMw21fljRyYObOmkKbSEGlyf/Uo=",
+      MOL: "U2FsdGVkX19dCsfUJ4IzM3WOgB3yT63tQ9OX7Kc0Mo/F+BZtNvBuWZ6VUy16z9MIUlUeKIkyebWVeq95dMDFOplMOEqfwPVxnKJ7IQrSlF9UmfHi49XCvn6X6h8OlJfa",
+      BIO: "U2FsdGVkX1/zZp2Gp0rZE9mYorgjRK0Z2lf4mlVr2gM0En0Pc5uUa3CRwhWXqmY7fJphvR6Vt8TzPiv4LpMXIPIHj5pRPqFO92aE2rJQnqc=",
+      MATH:"U2FsdGVkX1/yXzxuALqxzdaRxeNqn/VB/v1pqpBtM0Jt2ahnHca8FP/gbKTMipla9AvGtdG3tQlDHh/QDXZqbA==",
+      SPO: "U2FsdGVkX1+h3T3yTx+5VKoQlDFG9lA0efk5O+hSV+g8BQq/4XLrTwQe1oIPowQh4AoB6z3qSC5PZLK40/HzbPXbR+HCW1WOhqXLzc1P0h+a/lUUEUqyTKNScwvhCJBuW3czts498mz11MG3cyEJYlk90JMO+HXXDBsOwWoBfliFIy1T4dHg9LvPXhlmetMW",
+      GEO: "U2FsdGVkX184fsKxa3o1OU+fl6Xj3gpWsBb64wSd0i7YKL0hKWTtvrho2hdOgL77WznCeBoMlIlOdJC5uslArfio7GicpVbOy1IoarqpQpqLPAptO9Vyimhe6t6D1S3R",
+      STAT:"U2FsdGVkX19xcjltVkyF+OvLxzQDpePWdmJtVK2Mx1h3C2ANNib+V+U4O1IwT8Mv",
+      CHEM:"U2FsdGVkX1/XkY7vCcOsSZ0APoW3QGpS4y5ZGFgepF/uvsk1JyeEePPZGIAFREwkEedsrjeyh3GRe8Ri5fJ3UvCv+7ogHaAAKWcS+ZyTVJPoAxrT+xxlydRWdqUQAIuy"
+    };
+
+    // === SHA-256 해시 함수 ===
+    async function sha256(str) {
+      const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+    }
+
+    // === 힌트 해제 함수 ===
+    async function unlock() {
+      const raw = (document.getElementById('codeInput').value || '').trim().toUpperCase();
+      const prefix = raw.split('-')[0];
+      const msg = document.getElementById('unlockMsg');
+      const list = document.getElementById('hintList');
+
+      if (!DEPT[prefix]) {
+        msg.textContent = "알 수 없는 학과 코드입니다.";
+        return;
+      }
+      const hash = await sha256(raw);
+
+      if (VALID_HASH[prefix] !== hash) {
+        msg.textContent = "잘못된 코드입니다.";
+        return;
+      }
+
+      try {
+        const bytes = CryptoJS.AES.decrypt(HINTS[prefix], raw);
+        const text = bytes.toString(CryptoJS.enc.Utf8);
+        if (!text) throw new Error();
+        msg.textContent = "단서 해제 성공!";
+        const item = document.createElement('div');
+        item.className = 'hint-item';
+        item.innerHTML = `<b>${DEPT[prefix]}</b><br/>${text}`;
+        list.appendChild(item);
+      } catch {
+        msg.textContent = "복호화 실패";
+      }
+    }
+
+    document.getElementById('btnUnlock').addEventListener('click', unlock);
+  </script>
+
+
+
 
   <script>
     // 간단한 스크립트: 섹션 스크롤 시 메뉴 active 상태 업데이트 + 공유
