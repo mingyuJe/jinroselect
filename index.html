@@ -344,12 +344,25 @@
         item.className = 'hint-item';
         item.innerHTML = `<b>${DEPT[prefix]}</b><br/>${text}`;
         list.appendChild(item);
+
+        const unlocked = JSON.parse(localStorage.getItem('unlockedHints') || "{}");
+        unlocked[prefix] = text;
+        localStorage.setItem('unlockedHints', JSON.stringify(unlocked));
       } catch {
         msg.textContent = "복호화 실패";
       }
     }
 
     document.getElementById('btnUnlock').addEventListener('click', unlock);
+    window.addEventListener('DOMContentLoaded', () => {
+      const saved = JSON.parse(localStorage.getItem('unlockedHints') || "{}");
+      for (const [prefix, text] of Object.entries(saved)) {
+        const item = document.createElement('div');
+        item.className = 'hint-item';
+        item.innerHTML = `<b>${DEPT[prefix]}</b><br/>${text}`;
+        document.getElementById('hintList').appendChild(item);
+      }
+    });
   </script>
 
 
