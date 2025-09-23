@@ -109,7 +109,7 @@
   <section class="hero" id="about">
     <div class="wrap">
       <h1 class="title-glitch">기획국장 살인사건</h1>
-      <p class="subtitle">각 학과 <b>부스를 체험</b>하면 힌트를 얻을 수 있는 코드가 지급됩니다. <b>해당 코드를 홈페이지에 입력하세요</b></p>
+      <p class="subtitle">각 학과 <b>부스를 체험</b>하면 힌트가 지급됩니다. <b>웹 페이지에는 힌트가 없습니다.</b> 현장에서 확인하세요.</p>
       <div class="cta">
         <a class="btn primary" href="#how">참여 시작하기</a>
         <button class="btn ghost" id="shareBtn" type="button">링크 공유</button>
@@ -123,17 +123,17 @@
       <div class="card">
         <div class="kicker">Step 0</div>
         <h2>카드뉴스 사전 배포</h2>
-        <p class="muted">행사 전, 해당 페이지와 카드뉴스로 <b>용의자 기본 정보</b>를 제공합니다.</p>
+        <p class="muted">행사 전, 본 페이지와 연동된 카드뉴스로 <b>용의자 기본 정보</b>를 제공합니다.</p>
       </div>
       <div class="card">
         <div class="kicker">Step 1</div>
         <h2>부스 방문 → 단서 수집</h2>
-        <p class="muted">행사 당일, 각 학과 부스 방문 시 힌트를 얻을 수 있는 코드를 지급합니다.</p>
+        <p class="muted">행사 당일, 각 학과 부스 방문 시 힌트를 지급합니다.</p>
       </div>
       <div class="card">
         <div class="kicker">Step 2</div>
         <h2>정답 응모</h2>
-        <p class="muted">수집한 힌트를 종합하여 <b>자연과학대학 운영본부 부스</b>에 최종 용의자를 선택합니다.</p>
+        <p class="muted">수집한 힌트를 종합하여 <b>자연과학대학 운영본부 부스</b>에 최종 용의자와 근거를 제출합니다.</p>
       </div>
       <div class="card">
         <div class="kicker">Step 3</div>
@@ -210,16 +210,15 @@
 
     <div class="card">
       <div class="codebox">
-        <input id="codeInput" type="text" placeholder="코드를 입력하세요" inputmode="latin" autocomplete="off"/>
+        <input id="codeInput" type="text" placeholder="코드를 입력하세요" inputmode="latin" autocomplete="off" pattern="[A-Z0-9\-]+" autocapitalize="characters"/>
         <button class="btn primary" id="btnUnlock" type="button">해제</button>
-        <button class="btn ghost" id="btnReset" type="button">초기화</button>
       </div>
       <div id="unlockMsg" class="muted" style="margin-top:8px"></div>
       <div id="hintList" class="hint-list"></div>
     </div>
 
     <div class="notice" style="margin-top:12px">
-      <b>안내:</b> 맞지 않는 코드를 입력하신 경우 힌트가 출력되지 않습니다.
+      <b>안내:</b> 같은 코드를 여러 명이 써도 됩니다.
     </div>
   </div>
   </section>
@@ -241,7 +240,7 @@
       <div class="card">
         <h2>규칙 & 유의사항</h2>
         <div class="rule"><div class="num">1</div><p class="muted">부스 체험만으로 힌트 제공. 별도 미션 없음.</p></div>
-        <div class="rule"><div class="num">2</div><p class="muted">힌트는 부분 정보입니다. <b>교차 배제</b>로 범인 특정정.</p></div>
+        <div class="rule"><div class="num">2</div><p class="muted">힌트는 부분 정보입니다. <b>교차 배제</b>로만 결론 도달.</p></div>
         <div class="rule"><div class="num">3</div><p class="muted">정답 공개는 행사 종료 이후 공개.</p></div>
         <div class="rule"><div class="num">4</div><p class="muted">정답자에 한정하여 상품 추첨 예정</p></div>
       </div>
@@ -258,14 +257,14 @@
         </details>
         <details>
           <summary>이미 아는 것 같으면 바로 제출해도 되나요?</summary>
-          <p class="muted">가능하지만, 오답일 경우 경품 추첨에서 제외됩니다.</p>
+          <p class="muted">가능하지만, 오답 패널티가 있을 수 있습니다.</p>
         </details>
       </div>
       <div class="card">
         <h2>문의</h2>
         <p class="muted">주관: 자연대 학생회 기획운영국</p>
         <p class="muted">문의: <a href="amaranth7@jbnu.ac.kr">amaranth7@jbnu.ac.kr</a></p>
-        <p class="muted">제작 : 기획운영국장 정민규</p>
+        <p class="muted">제작 : 정민규</p>
       </div>
     </div>
   </section>
@@ -318,40 +317,60 @@
     }
 
     // === 힌트 해제 함수 ===
-    async function unlock() {
-      const raw = (document.getElementById('codeInput').value || '').trim().toUpperCase();
-      const prefix = raw.split('-')[0];
-      const msg = document.getElementById('unlockMsg');
-      const list = document.getElementById('hintList');
+    // === 힌트 해제 함수 ===
+  async function unlock() {
+    const raw = (document.getElementById('codeInput').value || '').trim().toUpperCase();
+    const prefix = raw.split('-')[0];
+    const msg = document.getElementById('unlockMsg');
+    const list = document.getElementById('hintList');
 
-      if (!DEPT[prefix]) {
-        msg.textContent = "알 수 없는 학과 코드입니다.";
-        return;
-      }
-      const hash = await sha256(raw);
-
-      if (VALID_HASH[prefix] !== hash) {
-        msg.textContent = "잘못된 코드입니다.";
-        return;
-      }
-
-      try {
-        const bytes = CryptoJS.AES.decrypt(HINTS[prefix], raw);
-        const text = bytes.toString(CryptoJS.enc.Utf8);
-        if (!text) throw new Error();
-        msg.textContent = "단서 해제 성공!";
-        const item = document.createElement('div');
-        item.className = 'hint-item';
-        item.innerHTML = `<b>${DEPT[prefix]}</b><br/>${text}`;
-        list.appendChild(item);
-
-        const unlocked = JSON.parse(localStorage.getItem('unlockedHints') || "{}");
-        unlocked[prefix] = text;
-        localStorage.setItem('unlockedHints', JSON.stringify(unlocked));
-      } catch {
-        msg.textContent = "복호화 실패";
-      }
+    if (!DEPT[prefix]) {
+      msg.textContent = "알 수 없는 학과 코드입니다.";
+      return;
     }
+
+    const hash = await sha256(raw);
+
+    if (VALID_HASH[prefix] !== hash) {
+      msg.textContent = "잘못된 코드입니다.";
+      return;
+    }
+
+    // ✅ localStorage 불러오기
+    const unlocked = JSON.parse(localStorage.getItem('unlockedHints') || "{}");
+
+    // ✅ 이미 저장된 학과면 차단
+    if (unlocked[prefix]) {
+      msg.textContent = "이미 해제된 단서입니다.";
+      return;
+    }
+
+    // ✅ UI 중복 방지도 같이 적용
+    if (document.querySelector(`#hintList .hint-${prefix}`)) {
+      msg.textContent = "이미 해제된 단서입니다.";
+      return;
+    }
+
+    try {
+      const bytes = CryptoJS.AES.decrypt(HINTS[prefix], raw);
+      const text = bytes.toString(CryptoJS.enc.Utf8);
+      if (!text) throw new Error();
+
+      msg.textContent = "단서 해제 성공!";
+
+      const item = document.createElement('div');
+      item.className = `hint-item hint-${prefix}`; // prefix별 class 부여
+      item.innerHTML = `<b>${DEPT[prefix]}</b><br/>${text}`;
+      list.appendChild(item);
+
+      // ✅ localStorage에 처음만 저장
+      unlocked[prefix] = text;
+      localStorage.setItem('unlockedHints', JSON.stringify(unlocked));
+
+    } catch {
+      msg.textContent = "복호화 실패";
+    }
+  }
 
     document.getElementById('btnUnlock').addEventListener('click', unlock);
     window.addEventListener('DOMContentLoaded', () => {
@@ -401,8 +420,6 @@
   </script>
 </body>
 </html>
-
-
 
 
 
